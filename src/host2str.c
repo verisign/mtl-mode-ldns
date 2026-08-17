@@ -80,10 +80,10 @@ ldns_lookup_table ldns_algorithms[] = {
         { LDNS_ML_DSA_44, "ML_DSA_44"},
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2 
-        { LDNS_SLH_DSA_SHA2_128s, "SLH_DSA_SHA2_128s"},
+        { LDNS_SLH_DSA_SHA2_128s, "SLH_DSA_PURE_SHA2_128S"},
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHAKE
-        { LDNS_SLH_DSA_SHAKE_128s, "SLH_DSA_SHAKE_128s"},
+        { LDNS_SLH_DSA_SHAKE_128s, "SLH_DSA_PURE_SHAKE_128S"},
 #endif
 #ifdef PQC_ALGO_MAYO_1
 		{ LDNS_MAYO_1, "MAYO-1"},
@@ -3362,14 +3362,14 @@ ldns_key2buffer_str(ldns_buffer *output, const ldns_key *k)
 #ifdef PQC_ALGO_SLH_DSA_SHA2
             case LDNS_SIGN_SLH_DSA_SHA2_128s:
                 ldns_buffer_printf(output, "Private-key-format: v1.2\n");
-                ldns_buffer_printf(output, "Algorithm: %d (SLH_DSA_SHA2_128s)\n", LDNS_SIGN_SLH_DSA_SHA2_128s);
+                ldns_buffer_printf(output, "Algorithm: %d (SLH_DSA_PURE_SHA2_128S)\n", LDNS_SIGN_SLH_DSA_SHA2_128s);
                 status = ldns_oqs_key2buffer_str(output, k);
                 break;			
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHAKE
             case LDNS_SIGN_SLH_DSA_SHAKE_128s:
                 ldns_buffer_printf(output, "Private-key-format: v1.2\n");
-                ldns_buffer_printf(output, "Algorithm: %d (SLH_DSA_SHAKE_128s)\n", LDNS_SIGN_SLH_DSA_SHAKE_128s);
+                ldns_buffer_printf(output, "Algorithm: %d (SLH_DSA_PURE_SHAKE_128S)\n", LDNS_SIGN_SLH_DSA_SHAKE_128s);
                 status = ldns_oqs_key2buffer_str(output, k);
                 break;	
 #endif

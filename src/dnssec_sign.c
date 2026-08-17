@@ -284,7 +284,7 @@ ldns_sign_public_buffer(ldns_buffer *sign_buf, ldns_key *current_key)
 	#endif
 	#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
 	case LDNS_SIGN_SNOVA_24_5_4_MTL_SHAKE_128:
-	#endif	
+	#endif
 		b64rdf = ldns_sign_public_mtl(sign_buf, ldns_key_external_key(current_key));
         break;
 #endif
@@ -1561,7 +1561,7 @@ ldns_dnssec_zone_create_rrsigs_flg( ldns_dnssec_zone *zone
 	}
 
 #ifdef PQC_ALGO_MTL
-	ldns_dnssec_zone_update_mtl_rrsigs(new_rrs, key_list, flags);
+	ldns_dnssec_zone_update_mtl_rrsigs(new_rrs, key_list);
 #endif
 
 	ldns_rr_list_deep_free(pubkey_list);
@@ -1570,7 +1570,7 @@ ldns_dnssec_zone_create_rrsigs_flg( ldns_dnssec_zone *zone
 
 #ifdef PQC_ALGO_MTL
 ldns_status
-ldns_dnssec_zone_update_mtl_rrsigs(ldns_rr_list *new_rrs, ldns_key_list *key_list, int flags) 
+ldns_dnssec_zone_update_mtl_rrsigs(ldns_rr_list *new_rrs, ldns_key_list *key_list) 
 {
 	ldns_status result = LDNS_STATUS_OK;
     MTLLIB_CTX* priv_key = NULL;
@@ -1582,13 +1582,9 @@ ldns_dnssec_zone_update_mtl_rrsigs(ldns_rr_list *new_rrs, ldns_key_list *key_lis
     size_t mtl_rrsig_id_size = 0;
     uint32_t key_count = 0;
     ldns_key *current_key = NULL;
-    uint16_t soa_sig_count = 0;
-    uint16_t dnskey_sig_count = 0;
     bool full_signature = false;
 	MTLLIB_BUFFER* signature_buffer = NULL;
 
-    soa_sig_count = 0;
-    dnskey_sig_count = 0;
     // Update the RRSIGs that are merkle based since the batch is now signed
     for (i = 0; i < ldns_rr_list_rr_count(new_rrs); i++) {
         ldns_rr* rr_ptr = ldns_rr_list_rr(new_rrs, i);
@@ -1627,12 +1623,8 @@ ldns_dnssec_zone_update_mtl_rrsigs(ldns_rr_list *new_rrs, ldns_key_list *key_lis
                         priv_key = ldns_key_external_key(current_key);
 
 						// Only update based on keys that are also MTL based
-                        if((priv_key != NULL) &&
-                           (
-							ldns_key_algorithm_is_mtl(current_key)
-						   )) {
+                        if((priv_key != NULL) && (ldns_key_algorithm_is_mtl(current_key))) {
 							mtl_ctx = priv_key->mtl;
-
 
                             if(memcmp(mtl_rrsig_id->sid, mtl_ctx->sid.id, mtl_rrsig_id->sid_len) == 0) { 
 								// The key matches the MTL context so use it to sign the record
@@ -1640,18 +1632,13 @@ ldns_dnssec_zone_update_mtl_rrsigs(ldns_rr_list *new_rrs, ldns_key_list *key_lis
 								full_signature = false;
 								switch(ldns_rdf2rr_type(ldns_rr_rrsig_typecovered(rr_ptr))) {
 									case LDNS_RR_TYPE_SOA:
-										if((!(flags&LDNS_SIGN_DNSKEY_WITH_ZSK)) &&
-										   (soa_sig_count < 1)) {
-											full_signature = true;
-											soa_sig_count++;
-										} 
+										full_signature = true;
 										break;
 									case LDNS_RR_TYPE_DNSKEY:
-										if((flags&LDNS_SIGN_DNSKEY_WITH_ZSK) || 
-										   (dnskey_sig_count < 1)) {
-											full_signature = true;
-											dnskey_sig_count++;
-										}
+										full_signature = true;
+										break;
+									case LDNS_RR_TYPE_ZONEMD:
+										full_signature = true;
 										break;
 									default:
 										full_signature = false;

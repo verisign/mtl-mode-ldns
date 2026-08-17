@@ -248,7 +248,7 @@ ldns_edns_option *
 ldns_edns_option_list_get_option(const ldns_edns_option_list *option_list, size_t index)
 {
 	if (option_list && index < ldns_edns_option_list_get_count(option_list)) {
-		assert(option_list->_options[index]);
+		assert(option_list->_options[index] != NULL);
 		return option_list->_options[index];
 	} else {
 		return NULL;

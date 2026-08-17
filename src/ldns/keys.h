@@ -225,10 +225,10 @@ typedef enum ldns_enum_signing_algorithm ldns_signing_algorithm;
     #define PQC_ALGO_ML_DSA_SCHEME "ML-DSA-44"
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2
-    #define PQC_ALGO_SLH_DSA_SHA2_SCHEME "SPHINCS+-SHA2-128s-simple"
+    #define PQC_ALGO_SLH_DSA_SHA2_SCHEME "SLH_DSA_PURE_SHA2_128S"
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHAKE
-    #define PQC_ALGO_SLH_DSA_SHAKE_SCHEME "SPHINCS+-SHAKE-128s-simple"
+    #define PQC_ALGO_SLH_DSA_SHAKE_SCHEME "SLH_DSA_PURE_SHAKE_128S"
 #endif
 #ifdef PQC_ALGO_MAYO_1
     #define PQC_ALGO_MAYO_1_SCHEME "MAYO-1"
@@ -322,6 +322,7 @@ struct ldns_struct_key {
     } _extra;
     /** Owner name of the key */
     ldns_rdf *_pubkey_owner;
+    char key_filename[2048];
 };
 typedef struct ldns_struct_key ldns_key;
 

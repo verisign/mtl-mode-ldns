@@ -132,9 +132,9 @@ LADDER* ldns_dnssec_mtl_ladder_find_ladder(SERIESID* sid, uint32_t leaf_index) {
                             target = ladder_cache->cache[l];
                             target_span = cache_rung[r].right_index -  cache_rung[r].left_index;
                         } else {
-                            if(target_span < cache_rung[r].right_index -  cache_rung[r].left_index) {
+                            if(target_span > cache_rung[r].right_index -  cache_rung[r].left_index) {
                                 target = ladder_cache->cache[l];
-                                target_span = cache_rung[r].right_index -  cache_rung[r].left_index;								
+                                target_span = cache_rung[r].right_index -  cache_rung[r].left_index;
                             }
                         }
                     }
@@ -176,7 +176,7 @@ RUNG* ldns_dnssec_mtl_ladder_find_rung(AUTHPATH* path) {
                             target = &cache_rung[r];
                             target_span = cache_rung[r].right_index -  cache_rung[r].left_index;
                         } else {
-                            if(target_span < cache_rung[r].right_index -  cache_rung[r].left_index) {
+                            if(target_span > cache_rung[r].right_index -  cache_rung[r].left_index) {
                                 target = &cache_rung[r];
                                 target_span = cache_rung[r].right_index -  cache_rung[r].left_index;								
                             }

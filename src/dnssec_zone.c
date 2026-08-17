@@ -1970,9 +1970,16 @@ dnssec_zone_equip_zonemd(ldns_dnssec_zone *zone,
 		zonemd_rrset->next = *rrset_ref;
 		*rrset_ref = zonemd_rrset;
 	}
-	if ((zonemd_rrsigs = ldns_sign_public(zonemd_rr_list, key_list)))
+	if ((zonemd_rrsigs = ldns_sign_public(zonemd_rr_list, key_list))) {
+		#ifdef PQC_ALGO_MTL
+			// Update any RRSIGS that are signed with MTL mode for full signatures
+			ldns_dnssec_zone_update_mtl_rrsigs(zonemd_rrsigs, key_list);
+		#endif
+
 		st = rr_list2dnssec_rrs(  zonemd_rrsigs
 		                       , &zonemd_rrset->signatures, new_rrs);
+	}
+
 	if (!st)
 		st = rr_list2dnssec_rrs(  zonemd_rr_list
 		                       , &zonemd_rrset->rrs, new_rrs);
