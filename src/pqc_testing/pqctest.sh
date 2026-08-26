@@ -183,8 +183,8 @@ declare -a pqc_schemes=(
     ML_DSA_44
     MAYO-1
     MAYO-2
-    SLH_DSA_SHA2_128s
-    SLH_DSA_SHAKE_128s
+    SLH_DSA_PURE_SHA2_128S
+    SLH_DSA_PURE_SHAKE_128S
     SNOVA_24_5_4
 #   Hawk-512
 #    SQIsign_lvl1

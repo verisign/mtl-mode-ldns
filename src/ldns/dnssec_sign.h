@@ -244,17 +244,12 @@ ldns_status ldns_dnssec_zone_create_rrsigs_flg(ldns_dnssec_zone *zone,
  *            added to this list, so the caller can free them
  *            later
  * \param[in] key_list list of keys to sign with.
- * \param[in] flags option flags for signing process. 0 makes DNSKEY
- * RRset signed with the minimal key set, that is only SEP keys are used
- * for signing. If there are no SEP keys available, non-SEP keys will
- * be used. LDNS_SIGN_DNSKEY_WITH_ZSK makes DNSKEY type signed with all
- * keys. 0 is the default.
  * \return LDNS_STATUS_OK on success, error otherwise
  */
 #ifdef PQC_ALGO_MTL
 ldns_status
 ldns_dnssec_zone_update_mtl_rrsigs(ldns_rr_list *new_rrs,
-				    ldns_key_list *key_list, int flags);
+				    ldns_key_list *key_list);
 #endif					
 
 /**

@@ -6,6 +6,8 @@
  */
 
 #include <stdio.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 #include "config.h"
 
@@ -946,6 +948,7 @@ main(int argc, char *argv[])
 				if (inception != 0) {
 					ldns_key_set_inception(key, inception);
 				}
+				strncpy(key->key_filename, keyfile_name, 2047);
 
 				LDNS_FREE(keyfile_name);
 				
@@ -1109,6 +1112,29 @@ main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	
+	#ifdef PQC_ALGO_MTL	
+		// Need to save the MTL keys "state"
+		for(i=0; i<ldns_key_list_key_count(keys); i++) {
+			key = ldns_key_list_key(keys, i);
+			if(ldns_key_algorithm_is_mtl(key)) {
+				// Save the MTL key
+					/* use open() here to prevent creating world-readable private keys (CVE-2014-3209)*/
+					int fd = open(key->key_filename, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+					if (fd < 0) {
+						fprintf(stderr, "Error updating the private key file\n");
+					}
+
+					FILE* file = fdopen(fd, "w");
+					if (!file) {
+						fprintf(stderr, "Error updating the private key file\n");
+					}
+
+					ldns_key_print(file, key);
+					fclose(file);
+			}
+		}
+	#endif
+
 	ldns_key_list_free(keys);
 	/* since the ldns_rr records are pointed to in both the ldns_zone
 	 * and the ldns_dnssec_zone, we can either deep_free the

@@ -101,10 +101,10 @@ ldns_lookup_table ldns_signing_algorithms[] = {
         { LDNS_SIGN_ML_DSA_44, "ML_DSA_44"},
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2 
-        { LDNS_SIGN_SLH_DSA_SHA2_128s, "SLH_DSA_SHA2_128s"},
+        { LDNS_SIGN_SLH_DSA_SHA2_128s, "SLH_DSA_PURE_SHA2_128S"},
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHAKE
-        { LDNS_SIGN_SLH_DSA_SHAKE_128s, "SLH_DSA_SHAKE_128s"},
+        { LDNS_SIGN_SLH_DSA_SHAKE_128s, "SLH_DSA_PURE_SHAKE_128S"},
 #endif        		
 #ifdef PQC_ALGO_MAYO_1
 		{ LDNS_SIGN_MAYO_1, "MAYO-1"},

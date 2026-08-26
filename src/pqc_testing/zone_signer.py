@@ -29,10 +29,10 @@ algorithm_list = {
     "ECDSA": {"id": "013", "lbl": "ECDSAP256SHA256"},
     "fl-dsa": {"id": "244", "lbl": "FL_DSA_512"},
     "ml-dsa": {"id": "245", "lbl": "ML_DSA_44"},
-    "slh-dsa-sha": {"id": "246", "lbl": "SLH_DSA_SHA2_128s"},
-    "slh-dsa-shake": {"id": "247", "lbl": "SLH_DSA_SHAKE_128s"},
-    "slh-dsa-mtl-sha": {"id": "248", "lbl": "SLH_DSA_MTL_SHA2_128s"},
-    "slh-dsa-mtl-shake": {"id": "249", "lbl": "SLH_DSA_MTL_SHAKE_128s"},
+    "slh-dsa-sha": {"id": "246", "lbl": "SLH_DSA_PURE_SHA2_128S"},
+    "slh-dsa-shake": {"id": "247", "lbl": "SLH_DSA_PURE_SHAKE_128S"},
+    "slh-dsa-mtl-sha": {"id": "248", "lbl": "SLH_DSA_PURE_MTL_SHA2_128S"},
+    "slh-dsa-mtl-shake": {"id": "249", "lbl": "SLH_DSA_PURE_MTL_SHAKE_128S"},
 }
 
 
