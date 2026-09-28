@@ -1653,7 +1653,7 @@ ldns_dnssec_zone_update_mtl_rrsigs(ldns_rr_list *new_rrs, ldns_key_list *key_lis
 								}
 
 								if(!full_signature) {
-									ldns_buffer_write_u8(sign_buf, 0);
+									ldns_buffer_write_u8(sign_buf, 2);
 									if(mtllib_buffer_initialize(&signature_buffer, mtllib_sign_get_condensed_sig_length(priv_key, mtl_rrsig_id), NULL) != MTLLIB_OK) {
 										return LDNS_STATUS_INTERNAL_ERR;
 									}

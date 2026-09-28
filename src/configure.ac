@@ -249,7 +249,7 @@ case "$enable_pqc_algo_ml_dsa" in
 	""|no)
 		;;
 	yes)
-		AC_DEFINE_UNQUOTED([PQC_ALGO_ML_DSA], [245], [Define this to enable zone signing with ML-DSA signatures])
+		AC_DEFINE_UNQUOTED([PQC_ALGO_ML_DSA], [18], [Define this to enable zone signing with ML-DSA signatures])
 		AC_SEARCH_LIBS([OQS_SIG_new], [oqs], ,[AC_MSG_ERROR(an acceptable version of liboqs was not found)])
 		;;
 	*)
