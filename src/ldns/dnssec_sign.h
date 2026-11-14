@@ -99,7 +99,7 @@ typedef struct mtl_id {
 } mtl_id;
 #endif
 
-#if defined(PQC_ALGO_FL_DSA) || defined(PQC_ALGO_ML_DSA) || defined(PQC_ALGO_SLH_DSA_SHA2) || defined(PQC_ALGO_SLH_DSA_SHAKE) || defined(PQC_ALGO_MAYO_1) || defined(PQC_ALGO_MAYO_2) || defined(PQC_ALGO_SNOVA)
+#if defined(PQC_ALGO_SIGS)
 /**
  * Sign a buffer with a PQ Safe algorithm from LibOQS
  * \param[in] to_sign buffer with the data
@@ -107,16 +107,6 @@ typedef struct mtl_id {
  * \return a ldns_rdf with the signed data
  */
 ldns_rdf * ldns_sign_public_oqs(ldns_buffer *to_sign, oqs_key *key);
-#endif
-
-#if defined(PQC_ALGO_SQISIGN) || defined(PQC_ALGO_HAWK)
-/**
- * Sign a buffer with a custom algorithm
- * \param[in] to_sign buffer with the data
- * \param[in] key the key to use
- * \return a ldns_rdf with the signed data
- */
-ldns_rdf* ldns_sign_public_custom(ldns_buffer* to_sign, oqs_key* key);
 #endif
 
 #ifdef PQC_ALGO_MTL

@@ -342,12 +342,26 @@ ldns_rr_dnskey_key_size_raw(const unsigned char* keydata,
 	#endif
 		return 897 * 8;		
 #endif
-#ifdef PQC_ALGO_ML_DSA
+#ifdef PQC_ALGO_ML_DSA_44
 	case LDNS_SIGN_ML_DSA_44:
-	#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
+	#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
     case LDNS_SIGN_ML_DSA_44_MTL_SHAKE_128:
 	#endif
 		return 1312 * 8;	
+#endif
+#ifdef PQC_ALGO_ML_DSA_65
+	case LDNS_SIGN_ML_DSA_65:
+	#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+    case LDNS_SIGN_ML_DSA_65_MTL_SHAKE_128:
+	#endif
+		return 1952 * 8;	
+#endif
+#ifdef PQC_ALGO_ML_DSA_87
+	case LDNS_SIGN_ML_DSA_87:
+	#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+    case LDNS_SIGN_ML_DSA_87_MTL_SHAKE_128:
+	#endif
+		return 2592 * 8;	
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2 
 	case LDNS_SIGN_SLH_DSA_SHA2_128s:
@@ -363,27 +377,6 @@ ldns_rr_dnskey_key_size_raw(const unsigned char* keydata,
 	#endif
 		return 32 * 8;	
 #endif
-#ifdef PQC_ALGO_MAYO_1
-	case LDNS_SIGN_MAYO_1:
-	#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-	case LDNS_SIGN_MAYO_1_MTL_SHAKE_128:
-	#endif
-		return 1420 * 8;
-#endif
-#ifdef PQC_ALGO_MAYO_2_MTL
-	case LDNS_SIGN_MAYO_2:
-	#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-	case LDNS_SIGN_MAYO_2_MTL_SHAKE_128:
-	#endif
-		return 4912 * 8;
-#endif
-#ifdef PQC_ALGO_SNOVA
-	case LDNS_SIGN_SNOVA_24_5_4:
-	#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-	case LDNS_SIGN_SNOVA_24_5_4_MTL_SHAKE_128:
-	#endif	
-		return 1016 * 8;
-#endif	
 	default:
 		return 0;
 	}
