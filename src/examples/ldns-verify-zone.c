@@ -692,29 +692,20 @@ verify_dnssec_zone(ldns_dnssec_zone *dnssec_zone, ldns_rdf *zone_name,
 						#ifdef PQC_ALGO_FL_DSA_MTL_SHAKE
 						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_FL_DSA_MTL_SHAKE) ||
 						#endif
-						#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
-						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_ML_DSA_MTL_SHAKE) ||
+						#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
+						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_ML_DSA_44_MTL_SHAKE) ||
+						#endif
+						#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_ML_DSA_65_MTL_SHAKE) ||
+						#endif
+						#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_ML_DSA_87_MTL_SHAKE) ||
 						#endif
 						#ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
 						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2) ||
 						#endif
 						#ifdef PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE
 						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE) ||
-						#endif
-						#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_MAYO_1_MTL_SHAKE) ||
-						#endif
-						#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_MAYO_2_MTL_SHAKE) ||
-						#endif
-						#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_SNOVA_MTL_SHAKE) ||
-						#endif
-						#ifdef PQC_ALGO_SQISIGN_MTL_SHAKE
-						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_SQISIGN_MTL_SHAKE) ||
-						#endif
-						#ifdef PQC_ALGO_HAWK_MTL_SHAKE
-						(ldns_rdf2native_int8(ldns_rr_rrsig_algorithm(rr_sig->rr)) == PQC_ALGO_HAWK_MTL_SHAKE) ||
 						#endif
 						false
 						) {
@@ -737,8 +728,14 @@ verify_dnssec_zone(ldns_dnssec_zone *dnssec_zone, ldns_rdf *zone_name,
 											#ifdef PQC_ALGO_FL_DSA_MTL_SHAKE
 											(algo == LDNS_FL_DSA_512_MTL_SHAKE_128) ||
 											#endif
-											#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
+											#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
 											(algo == LDNS_ML_DSA_44_MTL_SHAKE_128) ||
+											#endif
+											#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+											(algo == LDNS_ML_DSA_65_MTL_SHAKE_128) ||
+											#endif
+											#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+											(algo == LDNS_ML_DSA_87_MTL_SHAKE_128) ||
 											#endif
 											#ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
 											(algo == LDNS_SLH_DSA_SHA2_128s_MTL_SHA2_128) ||
@@ -746,15 +743,6 @@ verify_dnssec_zone(ldns_dnssec_zone *dnssec_zone, ldns_rdf *zone_name,
 											#ifdef PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE
 											(algo == LDNS_SLH_DSA_SHAKE_128s_MTL_SHAKE_128) ||
 											#endif
-											#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-											(algo == LDNS_MAYO_1_MTL_SHAKE_128) ||
-											#endif
-											#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-											(algo == LDNS_MAYO_2_MTL_SHAKE_128) ||
-											#endif
-											#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-											(algo == LDNS_SNOVA_24_5_4_MTL_SHAKE_128) ||
-											#endif										
 											false
 										) {
 											ldns_buffer* key_buf = ldns_buffer_new(LDNS_MAX_PACKETLEN);

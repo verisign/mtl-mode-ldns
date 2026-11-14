@@ -15,21 +15,8 @@
 #include <openssl/err.h>
 #include <openssl/md5.h>
 
-#if defined(PQC_ALGO_FL_DSA) || defined(PQC_ALGO_ML_DSA) || defined(PQC_ALGO_SLH_DSA_SHA2) || defined(PQC_ALGO_SLH_DSA_SHAKE) || defined(PQC_ALGO_MAYO_1) || defined(PQC_ALGO_MAYO_2) || defined(PQC_ALGO_SNOVA) || defined(PQC_ALGO_MTL)
+#ifdef PQC_ALGO_SIGS
 #include <oqs/sig.h>
-#endif
-
-#ifdef PQC_ALGO_SQISIGN
-#define SQISIGN_VARIANT lvl1
-#define SQISIGN_BUILD_TYPE_BROADWELL
-#include <sqisign/sig.h>
-#include <sqisign/sqisign_namespace.h>
-#include <sqisign/lvl1.h>
-#endif
-
-#ifdef PQC_ALGO_HAWK
-#define HAWK_LOGN 9
-#include <hawk/hawk.h>
 #endif
 
 #ifdef PQC_ALGO_MTL
@@ -2146,7 +2133,7 @@ ldns_verify_rrsig_ed448_raw(unsigned char* sig, size_t siglen,
 }
 #endif /* USE_ED448 */
 
-#if defined(PQC_ALGO_FL_DSA) || defined (PQC_ALGO_ML_DSA) || defined(PQC_ALGO_SLH_DSA_SHA2) || defined(PQC_ALGO_SLH_DSA_SHAKE) || defined(PQC_ALGO_MAYO_1) || defined(PQC_ALGO_MAYO_2) || defined (PQC_ALGO_SNOVA)
+#ifdef PQC_ALGO_SIGS
 static ldns_status
 ldns_verify_rrsig_oqs_raw(unsigned char* sig, size_t siglen,
     ldns_buffer* rrset, unsigned char* key, char* algo)
@@ -2169,45 +2156,6 @@ ldns_verify_rrsig_oqs_raw(unsigned char* sig, size_t siglen,
     }
     OQS_SIG_free(oqs_sig);
     return result;
-}
-#endif
-
-#if defined(PQC_ALGO_SQISIGN) || defined (PQC_ALGO_HAWK)
-static ldns_status
-ldns_verify_rrsig_custom_raw(unsigned char* sig, size_t siglen,
-    ldns_buffer* rrset, unsigned char* key, char* algo)
-{
-    #ifdef PQC_ALGO_SQISIGN
-    if (strncmp(algo, PQC_ALGO_SQISIGN_SCHEME, strlen(PQC_ALGO_SQISIGN_SCHEME)) == 0) {
-        if (sqisign_verify(ldns_buffer_begin(rrset), ldns_buffer_position(rrset), sig, siglen, key) == 0) {
-            return LDNS_STATUS_OK;
-        } else {
-            return LDNS_STATUS_CRYPTO_BOGUS;
-        }
-    }
-    else
-    #endif
-    #ifdef PQC_ALGO_HAWK
-    if (strncmp(algo, PQC_ALGO_HAWK_SCHEME, strlen(PQC_ALGO_HAWK_SCHEME)) == 0) {
-        uint8_t tmp_buf[HAWK_TMPSIZE_VERIFY(HAWK_LOGN)];
-        shake_context sc_data;
-        hawk_verify_start(&sc_data);
-        shake_inject(&sc_data, ldns_buffer_begin(rrset), ldns_buffer_position(rrset));
-        int ret_code = hawk_verify_finish(  HAWK_LOGN,
-                                            sig, siglen,
-                                            &sc_data,
-                                            key, HAWK_PUBKEY_SIZE(HAWK_LOGN),
-                                            tmp_buf, sizeof(tmp_buf));
-        if (ret_code == 1) {
-            return LDNS_STATUS_OK;
-        } else {
-            return LDNS_STATUS_CRYPTO_BOGUS;
-        }
-    }
-    else
-    #endif
-    //if no cases above match, return error
-    return LDNS_STATUS_ERR;
 }
 #endif
 
@@ -2234,11 +2182,21 @@ ldns_verify_rrsig_mtl_raw(unsigned char* sig, size_t siglen,
             keystr = (char*)PQC_ALGO_FL_DSA_MTL_SHAKE_SCHEME;
             break;
 		#endif
-		#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
+		#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
     	case LDNS_SIGN_ML_DSA_44_MTL_SHAKE_128:
-            keystr = (char*)PQC_ALGO_ML_DSA_MTL_SHAKE_SCHEME;
+            keystr = (char*)PQC_ALGO_ML_DSA_44_MTL_SHAKE_SCHEME;
             break;
 		#endif
+		#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+    	case LDNS_SIGN_ML_DSA_65_MTL_SHAKE_128:
+            keystr = (char*)PQC_ALGO_ML_DSA_65_MTL_SHAKE_SCHEME;
+            break;
+		#endif
+		#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+    	case LDNS_SIGN_ML_DSA_87_MTL_SHAKE_128:
+            keystr = (char*)PQC_ALGO_ML_DSA_87_MTL_SHAKE_SCHEME;
+            break;
+		#endif                
 		#ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
     	case LDNS_SIGN_SLH_DSA_SHA2_128s_MTL_SHA2_128:
             keystr = (char*)PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2_SCHEME;
@@ -2249,21 +2207,6 @@ ldns_verify_rrsig_mtl_raw(unsigned char* sig, size_t siglen,
             keystr = (char*)PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE_SCHEME;
             break;
 		#endif
-		#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-		case LDNS_SIGN_MAYO_1_MTL_SHAKE_128:
-            keystr = (char*)PQC_ALGO_MAYO_1_MTL_SHAKE_SCHEME;
-            break;
-		#endif
-		#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-		case LDNS_SIGN_MAYO_2_MTL_SHAKE_128:
-            keystr = (char*)PQC_ALGO_MAYO_2_MTL_SHAKE_SCHEME;
-            break;
-		#endif
-		#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-		case LDNS_SIGN_SNOVA_24_5_4_MTL_SHAKE_128:
-            keystr = (char*)PQC_ALGO_SNOVA_MTL_SHAKE_SCHEME;
-            break;
-		#endif	     
         default:
             keystr = NULL;
     }
@@ -2393,12 +2336,23 @@ ldns_verify_rrsig_mtl_ladder(unsigned char* sig, size_t siglen,
             keystr = (char*)PQC_ALGO_FL_DSA_MTL_SHAKE_SCHEME;
             break;
 		#endif
-		#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
+		#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
     	case LDNS_SIGN_ML_DSA_44_MTL_SHAKE_128:
-            keystr = (char*)PQC_ALGO_ML_DSA_MTL_SHAKE_SCHEME;
+            keystr = (char*)PQC_ALGO_ML_DSA_44_MTL_SHAKE_SCHEME;
             break;
 		#endif
-		#ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
+		#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+    	case LDNS_SIGN_ML_DSA_65_MTL_SHAKE_128:
+            keystr = (char*)PQC_ALGO_ML_DSA_65_MTL_SHAKE_SCHEME;
+            break;
+		#endif
+		#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+    	case LDNS_SIGN_ML_DSA_87_MTL_SHAKE_128:
+            keystr = (char*)PQC_ALGO_ML_DSA_87_MTL_SHAKE_SCHEME;
+            break;
+		#endif
+
+        #ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
     	case LDNS_SIGN_SLH_DSA_SHA2_128s_MTL_SHA2_128:
             keystr = (char*)PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2_SCHEME;
             break;
@@ -2408,21 +2362,6 @@ ldns_verify_rrsig_mtl_ladder(unsigned char* sig, size_t siglen,
             keystr = (char*)PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE_SCHEME;
             break;
 		#endif
-		#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-		case LDNS_SIGN_MAYO_1_MTL_SHAKE_128:
-            keystr = (char*)PQC_ALGO_MAYO_1_MTL_SHAKE_SCHEME;
-            break;
-		#endif
-		#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-		case LDNS_SIGN_MAYO_2_MTL_SHAKE_128:
-            keystr = (char*)PQC_ALGO_MAYO_2_MTL_SHAKE_SCHEME;
-            break;
-		#endif
-		#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-		case LDNS_SIGN_SNOVA_24_5_4_MTL_SHAKE_128:
-            keystr = (char*)PQC_ALGO_SNOVA_MTL_SHAKE_SCHEME;
-            break;
-		#endif	       
         default:
             keystr = NULL;
             hash_size = 0;
@@ -2646,11 +2585,23 @@ ldns_verify_rrsig_buffers_raw(unsigned char* sig, size_t siglen,
         return ldns_verify_rrsig_oqs_raw(sig, siglen, verify_buf,
                                          key, (char*)PQC_ALGO_FL_DSA_SCHEME);
 #endif
-#ifdef PQC_ALGO_ML_DSA
+#ifdef PQC_ALGO_ML_DSA_44
     case LDNS_SIGN_ML_DSA_44:
         // ML-DSA
         return ldns_verify_rrsig_oqs_raw(sig, siglen, verify_buf,
-                                         key, (char*)PQC_ALGO_ML_DSA_SCHEME);
+                                         key, (char*)PQC_ALGO_ML_DSA_44_SCHEME);
+#endif
+#ifdef PQC_ALGO_ML_DSA_65
+    case LDNS_SIGN_ML_DSA_65:
+        // ML-DSA
+        return ldns_verify_rrsig_oqs_raw(sig, siglen, verify_buf,
+                                         key, (char*)PQC_ALGO_ML_DSA_65_SCHEME);
+#endif
+#ifdef PQC_ALGO_ML_DSA_87
+    case LDNS_SIGN_ML_DSA_87:
+        // ML-DSA
+        return ldns_verify_rrsig_oqs_raw(sig, siglen, verify_buf,
+                                         key, (char*)PQC_ALGO_ML_DSA_87_SCHEME);
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2 
     case LDNS_SIGN_SLH_DSA_SHA2_128s:
@@ -2668,8 +2619,14 @@ ldns_verify_rrsig_buffers_raw(unsigned char* sig, size_t siglen,
 	#ifdef PQC_ALGO_FL_DSA_MTL_SHAKE
     case LDNS_SIGN_FL_DSA_512_MTL_SHAKE_128:
 	#endif
-	#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
+	#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
     case LDNS_SIGN_ML_DSA_44_MTL_SHAKE_128:
+	#endif
+	#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+    case LDNS_SIGN_ML_DSA_65_MTL_SHAKE_128:
+	#endif
+	#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+    case LDNS_SIGN_ML_DSA_87_MTL_SHAKE_128:
 	#endif
 	#ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
     case LDNS_SIGN_SLH_DSA_SHA2_128s_MTL_SHA2_128:
@@ -2677,42 +2634,8 @@ ldns_verify_rrsig_buffers_raw(unsigned char* sig, size_t siglen,
 	#ifdef PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE
     case LDNS_SIGN_SLH_DSA_SHAKE_128s_MTL_SHAKE_128:
 	#endif
-	#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-	case LDNS_SIGN_MAYO_1_MTL_SHAKE_128:
-	#endif
-	#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-	case LDNS_SIGN_MAYO_2_MTL_SHAKE_128:
-	#endif
-	#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-	case LDNS_SIGN_SNOVA_24_5_4_MTL_SHAKE_128:
-	#endif
         return ldns_verify_rrsig_mtl_raw(sig, siglen, verify_buf,
                                          key, keylen, algo);
-#endif
-#ifdef PQC_ALGO_MAYO_1
-    case LDNS_SIGN_MAYO_1:
-        return ldns_verify_rrsig_oqs_raw(sig, siglen, verify_buf,
-                                         key, (char*)PQC_ALGO_MAYO_1_SCHEME);
-#endif
-#ifdef PQC_ALGO_MAYO_2
-    case LDNS_SIGN_MAYO_2:
-        return ldns_verify_rrsig_oqs_raw(sig, siglen, verify_buf,
-                                         key, (char*)PQC_ALGO_MAYO_2_SCHEME);
-#endif
-#ifdef PQC_ALGO_SNOVA
-    case LDNS_SIGN_SNOVA_24_5_4:
-        return ldns_verify_rrsig_oqs_raw(sig, siglen, verify_buf,
-                                         key, (char*)PQC_ALGO_SNOVA_SCHEME);
-#endif
-#ifdef PQC_ALGO_SQISIGN
-    case LDNS_SIGN_SQISIGN_LVL1:
-        return ldns_verify_rrsig_custom_raw(sig, siglen, verify_buf,
-                                         key, (char*)PQC_ALGO_SQISIGN_SCHEME);
-#endif
-#ifdef PQC_ALGO_HAWK
-    case LDNS_SIGN_HAWK_512:
-        return ldns_verify_rrsig_custom_raw(sig, siglen, verify_buf,
-                                         key, (char*)PQC_ALGO_HAWK_SCHEME);
 #endif
     default:
         /* do you know this alg?! */
@@ -2800,8 +2723,14 @@ ldns_rrsig2rawsig_buffer(ldns_buffer* rawsig_buf, const ldns_rr* rrsig)
 #ifdef PQC_ALGO_FL_DSA
     case LDNS_SIGN_FL_DSA_512:
 #endif
-#ifdef PQC_ALGO_ML_DSA
+#ifdef PQC_ALGO_ML_DSA_44
     case LDNS_SIGN_ML_DSA_44:
+#endif
+#ifdef PQC_ALGO_ML_DSA_65
+    case LDNS_SIGN_ML_DSA_65:
+#endif
+#ifdef PQC_ALGO_ML_DSA_87
+    case LDNS_SIGN_ML_DSA_87:
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2 
     case LDNS_SIGN_SLH_DSA_SHA2_128s:
@@ -2809,42 +2738,24 @@ ldns_rrsig2rawsig_buffer(ldns_buffer* rawsig_buf, const ldns_rr* rrsig)
 #ifdef PQC_ALGO_SLH_DSA_SHAKE
     case LDNS_SIGN_SLH_DSA_SHAKE_128s:
 #endif
-#ifdef PQC_ALGO_MAYO_1
-    case LDNS_SIGN_MAYO_1:
-#endif
-#ifdef PQC_ALGO_MAYO_2
-    case LDNS_SIGN_MAYO_2:
-#endif
-#ifdef PQC_ALGO_SNOVA
-    case LDNS_SIGN_SNOVA_24_5_4:
-#endif
-#ifdef PQC_ALGO_SQISIGN
-    case LDNS_SIGN_SQISIGN_LVL1:
-#endif
-#ifdef PQC_ALGO_HAWK
-    case LDNS_SIGN_HAWK_512:
-#endif
 #ifdef PQC_ALGO_MTL
 	#ifdef PQC_ALGO_FL_DSA_MTL_SHAKE
     case LDNS_SIGN_FL_DSA_512_MTL_SHAKE_128:
 	#endif
-	#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
+	#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
     case LDNS_SIGN_ML_DSA_44_MTL_SHAKE_128:
+	#endif
+	#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+    case LDNS_SIGN_ML_DSA_65_MTL_SHAKE_128:
+	#endif
+	#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+    case LDNS_SIGN_ML_DSA_87_MTL_SHAKE_128:
 	#endif
 	#ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
     case LDNS_SIGN_SLH_DSA_SHA2_128s_MTL_SHA2_128:
 	#endif
 	#ifdef PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE
     case LDNS_SIGN_SLH_DSA_SHAKE_128s_MTL_SHAKE_128:
-	#endif
-	#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-	case LDNS_SIGN_MAYO_1_MTL_SHAKE_128:
-	#endif
-	#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-	case LDNS_SIGN_MAYO_2_MTL_SHAKE_128:
-	#endif
-	#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-	case LDNS_SIGN_SNOVA_24_5_4_MTL_SHAKE_128:
 	#endif
 #endif
     case LDNS_RSAMD5:

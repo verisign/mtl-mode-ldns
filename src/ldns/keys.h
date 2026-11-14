@@ -32,12 +32,6 @@
 #include <mtllib/mtl.h>
 #endif
 
-//"custom" algorithms piggyback off of some existing liboqs-specific functions
-//thus make this #define so the necessary liboqs-specific functions still compile
-#if defined(PQC_ALGO_SQISIGN) || defined(PQC_ALGO_HAWK)
-#define NEED_OQS_PIGGYBACK
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -72,8 +66,14 @@ enum ldns_enum_algorithm
 #ifdef PQC_ALGO_FL_DSA
         LDNS_FL_DSA_512 = PQC_ALGO_FL_DSA,
 #endif
-#ifdef PQC_ALGO_ML_DSA
-        LDNS_ML_DSA_44 = PQC_ALGO_ML_DSA,
+#ifdef PQC_ALGO_ML_DSA_44
+        LDNS_ML_DSA_44 = PQC_ALGO_ML_DSA_44,
+#endif
+#ifdef PQC_ALGO_ML_DSA_65
+        LDNS_ML_DSA_65 = PQC_ALGO_ML_DSA_65,
+#endif
+#ifdef PQC_ALGO_ML_DSA_87
+        LDNS_ML_DSA_87 = PQC_ALGO_ML_DSA_87,                
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2 
         LDNS_SLH_DSA_SHA2_128s = PQC_ALGO_SLH_DSA_SHA2,
@@ -81,42 +81,24 @@ enum ldns_enum_algorithm
 #ifdef PQC_ALGO_SLH_DSA_SHAKE
         LDNS_SLH_DSA_SHAKE_128s = PQC_ALGO_SLH_DSA_SHAKE,
 #endif                
-#ifdef PQC_ALGO_MAYO_1
-        LDNS_MAYO_1 = PQC_ALGO_MAYO_1,
-#endif
-#ifdef PQC_ALGO_MAYO_2
-        LDNS_MAYO_2 = PQC_ALGO_MAYO_2,
-#endif
-#ifdef PQC_ALGO_SNOVA
-        LDNS_SNOVA_24_5_4 = PQC_ALGO_SNOVA,
-#endif
-#ifdef PQC_ALGO_SQISIGN
-        LDNS_SQISIGN_LVL1 = PQC_ALGO_SQISIGN,
-#endif
-#ifdef PQC_ALGO_HAWK
-        LDNS_HAWK_512 = PQC_ALGO_HAWK,
-#endif
 #ifdef PQC_ALGO_FL_DSA_MTL_SHAKE
         LDNS_FL_DSA_512_MTL_SHAKE_128 = PQC_ALGO_FL_DSA_MTL_SHAKE,
 #endif
-#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
-        LDNS_ML_DSA_44_MTL_SHAKE_128 = PQC_ALGO_ML_DSA_MTL_SHAKE,
+#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
+        LDNS_ML_DSA_44_MTL_SHAKE_128 = PQC_ALGO_ML_DSA_44_MTL_SHAKE,
+#endif
+#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+        LDNS_ML_DSA_65_MTL_SHAKE_128 = PQC_ALGO_ML_DSA_65_MTL_SHAKE,
+#endif
+#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+        LDNS_ML_DSA_87_MTL_SHAKE_128 = PQC_ALGO_ML_DSA_87_MTL_SHAKE,
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
         LDNS_SLH_DSA_SHA2_128s_MTL_SHA2_128 = PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2,
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE
         LDNS_SLH_DSA_SHAKE_128s_MTL_SHAKE_128 = PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE,
-#endif                
-#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-        LDNS_MAYO_1_MTL_SHAKE_128 = PQC_ALGO_MAYO_1_MTL_SHAKE,
-#endif
-#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-        LDNS_MAYO_2_MTL_SHAKE_128 = PQC_ALGO_MAYO_2_MTL_SHAKE,
-#endif
-#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-        LDNS_SNOVA_24_5_4_MTL_SHAKE_128 = PQC_ALGO_SNOVA_MTL_SHAKE,
-#endif
+#endif   
         LDNS_INDIRECT           = 252,
         LDNS_PRIVATEDNS         = 253,
         LDNS_PRIVATEOID         = 254
@@ -169,8 +151,14 @@ enum ldns_enum_signing_algorithm
 #ifdef PQC_ALGO_FL_DSA
     LDNS_SIGN_FL_DSA_512 = LDNS_FL_DSA_512,
 #endif
-#ifdef PQC_ALGO_ML_DSA
+#ifdef PQC_ALGO_ML_DSA_44
     LDNS_SIGN_ML_DSA_44 = LDNS_ML_DSA_44,
+#endif
+#ifdef PQC_ALGO_ML_DSA_65
+    LDNS_SIGN_ML_DSA_65 = LDNS_ML_DSA_65,
+#endif
+#ifdef PQC_ALGO_ML_DSA_87
+    LDNS_SIGN_ML_DSA_87 = LDNS_ML_DSA_87,
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2 
     LDNS_SIGN_SLH_DSA_SHA2_128s = LDNS_SLH_DSA_SHA2_128s,
@@ -178,41 +166,23 @@ enum ldns_enum_signing_algorithm
 #ifdef PQC_ALGO_SLH_DSA_SHAKE
     LDNS_SIGN_SLH_DSA_SHAKE_128s = LDNS_SLH_DSA_SHAKE_128s,
 #endif        
-#ifdef PQC_ALGO_MAYO_1
-    LDNS_SIGN_MAYO_1 = LDNS_MAYO_1,
-#endif
-#ifdef PQC_ALGO_MAYO_2
-    LDNS_SIGN_MAYO_2 = LDNS_MAYO_2,
-#endif
-#ifdef PQC_ALGO_SNOVA
-    LDNS_SIGN_SNOVA_24_5_4 = LDNS_SNOVA_24_5_4,
-#endif
-#ifdef PQC_ALGO_SQISIGN
-    LDNS_SIGN_SQISIGN_LVL1 = LDNS_SQISIGN_LVL1,
-#endif
-#ifdef PQC_ALGO_HAWK
-    LDNS_SIGN_HAWK_512 = LDNS_HAWK_512,
-#endif
 #ifdef PQC_ALGO_FL_DSA_MTL_SHAKE
     LDNS_SIGN_FL_DSA_512_MTL_SHAKE_128 = LDNS_FL_DSA_512_MTL_SHAKE_128,
 #endif
-#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
+#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
     LDNS_SIGN_ML_DSA_44_MTL_SHAKE_128 = LDNS_ML_DSA_44_MTL_SHAKE_128,
+#endif
+#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+    LDNS_SIGN_ML_DSA_65_MTL_SHAKE_128 = LDNS_ML_DSA_65_MTL_SHAKE_128,
+#endif
+#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+    LDNS_SIGN_ML_DSA_87_MTL_SHAKE_128 = LDNS_ML_DSA_87_MTL_SHAKE_128,
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
     LDNS_SIGN_SLH_DSA_SHA2_128s_MTL_SHA2_128 = LDNS_SLH_DSA_SHA2_128s_MTL_SHA2_128,
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE
     LDNS_SIGN_SLH_DSA_SHAKE_128s_MTL_SHAKE_128 = LDNS_SLH_DSA_SHAKE_128s_MTL_SHAKE_128,
-#endif
-#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-    LDNS_SIGN_MAYO_1_MTL_SHAKE_128 = LDNS_MAYO_1_MTL_SHAKE_128,
-#endif
-#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-    LDNS_SIGN_MAYO_2_MTL_SHAKE_128 = LDNS_MAYO_2_MTL_SHAKE_128,
-#endif
-#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-    LDNS_SIGN_SNOVA_24_5_4_MTL_SHAKE_128 = LDNS_SNOVA_24_5_4_MTL_SHAKE_128,
 #endif
 };
 typedef enum ldns_enum_signing_algorithm ldns_signing_algorithm;
@@ -221,8 +191,14 @@ typedef enum ldns_enum_signing_algorithm ldns_signing_algorithm;
 #ifdef PQC_ALGO_FL_DSA
     #define PQC_ALGO_FL_DSA_SCHEME "Falcon-512"
 #endif
-#ifdef PQC_ALGO_ML_DSA
-    #define PQC_ALGO_ML_DSA_SCHEME "ML-DSA-44"
+#ifdef PQC_ALGO_ML_DSA_44
+    #define PQC_ALGO_ML_DSA_44_SCHEME "ML-DSA-44"
+#endif
+#ifdef PQC_ALGO_ML_DSA_65
+    #define PQC_ALGO_ML_DSA_65_SCHEME "ML-DSA-65"
+#endif
+#ifdef PQC_ALGO_ML_DSA_87
+    #define PQC_ALGO_ML_DSA_87_SCHEME "ML-DSA-87"
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2
     #define PQC_ALGO_SLH_DSA_SHA2_SCHEME "SLH_DSA_PURE_SHA2_128S"
@@ -230,42 +206,24 @@ typedef enum ldns_enum_signing_algorithm ldns_signing_algorithm;
 #ifdef PQC_ALGO_SLH_DSA_SHAKE
     #define PQC_ALGO_SLH_DSA_SHAKE_SCHEME "SLH_DSA_PURE_SHAKE_128S"
 #endif
-#ifdef PQC_ALGO_MAYO_1
-    #define PQC_ALGO_MAYO_1_SCHEME "MAYO-1"
-#endif
-#ifdef PQC_ALGO_MAYO_2
-    #define PQC_ALGO_MAYO_2_SCHEME "MAYO-2"
-#endif
-#ifdef PQC_ALGO_SNOVA
-    #define PQC_ALGO_SNOVA_SCHEME "SNOVA_24_5_4"
-#endif
-#ifdef PQC_ALGO_SQISIGN
-    #define PQC_ALGO_SQISIGN_SCHEME "SQIsign_lvl1"
-#endif
-#ifdef PQC_ALGO_HAWK
-    #define PQC_ALGO_HAWK_SCHEME "Hawk-512"
-#endif
 // MTL scheme strings
 #ifdef PQC_ALGO_FL_DSA_MTL_SHAKE
     #define PQC_ALGO_FL_DSA_MTL_SHAKE_SCHEME "Falcon-padded-512-MTL-SHAKE-128"
 #endif
-#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
-    #define PQC_ALGO_ML_DSA_MTL_SHAKE_SCHEME "ML-DSA-44-MTL-SHAKE-128"
+#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
+    #define PQC_ALGO_ML_DSA_44_MTL_SHAKE_SCHEME "ML-DSA-44-MTL-SHAKE-128"
+#endif
+#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+    #define PQC_ALGO_ML_DSA_65_MTL_SHAKE_SCHEME "ML-DSA-65-MTL-SHAKE-192"
+#endif
+#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+    #define PQC_ALGO_ML_DSA_87_MTL_SHAKE_SCHEME "ML-DSA-87-MTL-SHAKE-256"
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
     #define PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2_SCHEME "SLH-DSA-SHA2-128s-MTL-SHA2-128"
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE
     #define PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE_SCHEME "SLH-DSA-SHAKE-128s-MTL-SHAKE-128"
-#endif
-#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-    #define PQC_ALGO_MAYO_1_MTL_SHAKE_SCHEME "MAYO-1-MTL-SHAKE-128"
-#endif
-#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-    #define PQC_ALGO_MAYO_2_MTL_SHAKE_SCHEME "MAYO-2-MTL-SHAKE-128"
-#endif
-#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-    #define PQC_ALGO_SNOVA_MTL_SHAKE_SCHEME "SNOVA_24_5_4-MTL-SHAKE-128"
 #endif
 
 /**
@@ -341,7 +299,7 @@ struct mtl_key_param_set
 typedef struct mtl_key_param_set mtl_key;
 #endif
 
-#if defined(NEED_OQS_PIGGYBACK) || defined(PQC_ALGO_FL_DSA) || defined (PQC_ALGO_ML_DSA) || defined(PQC_ALGO_SLH_DSA_SHA2) || defined(PQC_ALGO_SLH_DSA_SHAKE) || defined(PQC_ALGO_MAYO_1) || defined(PQC_ALGO_MAYO_2) || defined(PQC_ALGO_SNOVA)
+#ifdef PQC_ALGO_SIGS
 struct oqs_key_param_set
 {
     uint8_t* sk;
@@ -351,12 +309,6 @@ struct oqs_key_param_set
     char* alg_id;
 };
 typedef struct oqs_key_param_set oqs_key;
-#endif
-
-#if defined(PQC_ALGO_SQISIGN) || defined(PQC_ALGO_HAWK)
-typedef struct oqs_key_param_set custom_key;
-//works EXACTLY like oqs_key but more generic name "custom_key"
-//meant to be used with external/custom libraries (ie non-MTL, non-liboqs, non-openssl)
 #endif
 
 /**
@@ -678,6 +630,7 @@ DSA *ldns_key_dsa_key(const ldns_key *k);
  * \return the algorithm
  */
 ldns_signing_algorithm ldns_key_algorithm(const ldns_key *k);
+
 #ifdef PQC_ALGO_MTL
 /**
  * check if the key is an MTL key

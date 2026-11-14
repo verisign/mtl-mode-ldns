@@ -78,8 +78,16 @@ suitable_hash(ldns_signing_algorithm algorithm)
 	case LDNS_SIGN_FL_DSA_512:
 	return LDNS_SHA256;	
 #endif
-#ifdef PQC_ALGO_ML_DSA
+#ifdef PQC_ALGO_ML_DSA_44
 	case LDNS_SIGN_ML_DSA_44:
+	return LDNS_SHA256;	
+#endif
+#ifdef PQC_ALGO_ML_DSA_65
+	case LDNS_SIGN_ML_DSA_65:
+	return LDNS_SHA256;	
+#endif
+#ifdef PQC_ALGO_ML_DSA_87
+	case LDNS_SIGN_ML_DSA_87:
 	return LDNS_SHA256;	
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHA2 
@@ -100,8 +108,22 @@ suitable_hash(ldns_signing_algorithm algorithm)
 		// DNSSEC currently does not define SHAKE but long term perhaps this should be SHAKE?
 		return LDNS_SHA256;
 #endif  
-#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
+#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
 	case LDNS_SIGN_ML_DSA_44_MTL_SHAKE_128:
+		fprintf(stderr, "ERROR: The default key algorithm's hash (SHAKE) is not supported by current standards. ");
+		fprintf(stderr, "Using SHA256 for POC purposes, but long term need to determine if this should be SHAKE.\n");	
+		// DNSSEC currently does not define SHAKE but long term perhaps this should be SHAKE?
+		return LDNS_SHA256;
+#endif  
+#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+	case LDNS_SIGN_ML_DSA_65_MTL_SHAKE_128:
+		fprintf(stderr, "ERROR: The default key algorithm's hash (SHAKE) is not supported by current standards. ");
+		fprintf(stderr, "Using SHA256 for POC purposes, but long term need to determine if this should be SHAKE.\n");	
+		// DNSSEC currently does not define SHAKE but long term perhaps this should be SHAKE?
+		return LDNS_SHA256;
+#endif  
+#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+	case LDNS_SIGN_ML_DSA_87_MTL_SHAKE_128:
 		fprintf(stderr, "ERROR: The default key algorithm's hash (SHAKE) is not supported by current standards. ");
 		fprintf(stderr, "Using SHA256 for POC purposes, but long term need to determine if this should be SHAKE.\n");	
 		// DNSSEC currently does not define SHAKE but long term perhaps this should be SHAKE?
@@ -113,27 +135,6 @@ suitable_hash(ldns_signing_algorithm algorithm)
 #endif
 #ifdef PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE
 	case LDNS_SIGN_SLH_DSA_SHAKE_128s_MTL_SHAKE_128:
-		fprintf(stderr, "ERROR: The default key algorithm's hash (SHAKE) is not supported by current standards. ");
-		fprintf(stderr, "Using SHA256 for POC purposes, but long term need to determine if this should be SHAKE.\n");	
-		// DNSSEC currently does not define SHAKE but long term perhaps this should be SHAKE?
-		return LDNS_SHA256;
-#endif
-#ifdef PQC_ALGO_MAYO_1_MTL
-	case PQC_ALGO_MAYO_1_MTL_SHAKE_128:
-		fprintf(stderr, "ERROR: The default key algorithm's hash (SHAKE) is not supported by current standards. ");
-		fprintf(stderr, "Using SHA256 for POC purposes, but long term need to determine if this should be SHAKE.\n");	
-		// DNSSEC currently does not define SHAKE but long term perhaps this should be SHAKE?
-		return LDNS_SHA256;
-#endif
-#ifdef PQC_ALGO_MAYO_2_MTL
-	case PQC_ALGO_MAYO_2_MTL_SHAKE_128:
-		fprintf(stderr, "ERROR: The default key algorithm's hash (SHAKE) is not supported by current standards. ");
-		fprintf(stderr, "Using SHA256 for POC purposes, but long term need to determine if this should be SHAKE.\n");	
-		// DNSSEC currently does not define SHAKE but long term perhaps this should be SHAKE?
-		return LDNS_SHA256;
-#endif
-#ifdef PQC_ALGO_SNOVA_MTL
-	case PQC_ALGO_SNOVA_MTL_SHAKE_128:
 		fprintf(stderr, "ERROR: The default key algorithm's hash (SHAKE) is not supported by current standards. ");
 		fprintf(stderr, "Using SHA256 for POC purposes, but long term need to determine if this should be SHAKE.\n");	
 		// DNSSEC currently does not define SHAKE but long term perhaps this should be SHAKE?

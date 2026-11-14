@@ -24,7 +24,7 @@
 #endif
 #endif /* HAVE_SSL */
 
-#if defined (PQC_ALGO_MTL) || defined (PQC_ALGO_FL_DSA) || defined (PQC_ALGO_ML_DSA) || defined (PQC_ALGO_SLH_DSA_SHA2) || defined (PQC_ALGO_SLH_DSA_SHAKE) || defined (PQC_ALGO_MAYO_1) || defined(PQC_ALGO_MAYO_2) || defined (PQC_ALGO_SNOVA)
+#if defined (PQC_ALGO_MTL) || defined (PQC_ALGO_SIGS)
 #include <oqs/sig.h>
 #endif
 
@@ -32,25 +32,6 @@
 #include <mtllib/mtl.h>
 #include <mtllib/mtllib.h>
 #include <mtllib/mtllib_buffer.h>
-#endif
-
-#ifdef PQC_ALGO_SQISIGN
-#define SQISIGN_VARIANT lvl1
-#define SQISIGN_BUILD_TYPE_BROADWELL
-#include <sqisign/sig.h>
-#include <sqisign/sqisign_namespace.h>
-#include <sqisign/lvl1.h>
-#endif
-
-#ifdef PQC_ALGO_HAWK
-#include <nistrng/rng.h>
-#define HAWK_LOGN 9
-#include <hawk/hawk.h>
-//randombytes wrapper to make it work with hawk's sign function
-static void hawk_randombytes(void* ctx, void* dst, size_t len) {
-    (void) ctx;	//unused variable compiler warning suppression
-    randombytes(dst, len);
-}
 #endif
 
 #define LDNS_SIGN_WITH_ZONEMD ( LDNS_SIGN_WITH_ZONEMD_SIMPLE_SHA384 \
@@ -238,27 +219,24 @@ ldns_sign_public_buffer(ldns_buffer *sign_buf, ldns_key *current_key)
 				   ldns_key_evp_key(current_key),
 				   EVP_md5());
 		break;
-#if defined(PQC_ALGO_FL_DSA) || defined(PQC_ALGO_ML_DSA) || defined(PQC_ALGO_SLH_DSA_SHA2) || defined(PQC_ALGO_SLH_DSA_SHAKE) || defined(PQC_ALGO_MAYO_1) || defined(PQC_ALGO_MAYO_2) || defined (PQC_ALGO_SNOVA)
+#ifdef PQC_ALGO_SIGS 
 	#ifdef PQC_ALGO_FL_DSA
     case LDNS_SIGN_FL_DSA_512:
 	#endif
-	#ifdef PQC_ALGO_ML_DSA
+	#ifdef PQC_ALGO_ML_DSA_44
     case LDNS_SIGN_ML_DSA_44:
 	#endif
+	#ifdef PQC_ALGO_ML_DSA_65
+    case LDNS_SIGN_ML_DSA_65:
+	#endif
+	#ifdef PQC_ALGO_ML_DSA_87
+    case LDNS_SIGN_ML_DSA_87:
+	#endif		
 	#ifdef PQC_ALGO_SLH_DSA_SHA2 
     case LDNS_SIGN_SLH_DSA_SHA2_128s:
 	#endif
 	#ifdef PQC_ALGO_SLH_DSA_SHAKE
     case LDNS_SIGN_SLH_DSA_SHAKE_128s:
-	#endif
-	#ifdef PQC_ALGO_MAYO_1
-	case LDNS_SIGN_MAYO_1:
-	#endif
-	#ifdef PQC_ALGO_MAYO_2
-	case LDNS_SIGN_MAYO_2:
-	#endif
-	#ifdef PQC_ALGO_SNOVA
-	case LDNS_SIGN_SNOVA_24_5_4:
 	#endif
 		b64rdf = ldns_sign_public_oqs(sign_buf, ldns_key_external_key(current_key));
 		break;
@@ -267,36 +245,23 @@ ldns_sign_public_buffer(ldns_buffer *sign_buf, ldns_key *current_key)
 	#ifdef PQC_ALGO_FL_DSA_MTL_SHAKE
     case LDNS_SIGN_FL_DSA_512_MTL_SHAKE_128:
 	#endif
-	#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
+	#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
     case LDNS_SIGN_ML_DSA_44_MTL_SHAKE_128:
 	#endif
+	#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+    case LDNS_SIGN_ML_DSA_65_MTL_SHAKE_128:
+	#endif
+	#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+    case LDNS_SIGN_ML_DSA_87_MTL_SHAKE_128:
+	#endif		
 	#ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
     case LDNS_SIGN_SLH_DSA_SHA2_128s_MTL_SHA2_128:
 	#endif
 	#ifdef PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE
     case LDNS_SIGN_SLH_DSA_SHAKE_128s_MTL_SHAKE_128:
 	#endif
-	#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-	case LDNS_SIGN_MAYO_1_MTL_SHAKE_128:
-	#endif
-	#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-	case LDNS_SIGN_MAYO_2_MTL_SHAKE_128:
-	#endif
-	#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-	case LDNS_SIGN_SNOVA_24_5_4_MTL_SHAKE_128:
-	#endif
 		b64rdf = ldns_sign_public_mtl(sign_buf, ldns_key_external_key(current_key));
         break;
-#endif
-#if defined(PQC_ALGO_SQISIGN) || defined(PQC_ALGO_HAWK)
-	#ifdef PQC_ALGO_SQISIGN
-	case LDNS_SIGN_SQISIGN_LVL1:
-	#endif
-	#ifdef PQC_ALGO_HAWK
-	case LDNS_SIGN_HAWK_512:
-	#endif
-		b64rdf = ldns_sign_public_custom(sign_buf, ldns_key_external_key(current_key));
-		break;
 #endif
 	default:
 		/* do _you_ know this alg? */
@@ -724,7 +689,7 @@ ldns_sign_public_rsamd5(ldns_buffer *to_sign, RSA *key)
 }
 #endif /* HAVE_SSL */
 
-#if defined(PQC_ALGO_FL_DSA) || defined (PQC_ALGO_ML_DSA) || defined(PQC_ALGO_SLH_DSA_SHA2) || defined(PQC_ALGO_SLH_DSA_SHAKE) || defined(PQC_ALGO_MAYO_1) || defined(PQC_ALGO_MAYO_2) || defined(PQC_ALGO_SNOVA)
+#ifdef PQC_ALGO_SIGS 
 ldns_rdf *
 ldns_sign_public_oqs(ldns_buffer *to_sign, oqs_key *key) {
     OQS_SIG *sig = NULL;
@@ -780,68 +745,6 @@ ldns_sign_public_mtl(ldns_buffer *to_sign, MTLLIB_CTX *key) {
     return sigdata_rdf;
 }
 #endif
-
-#if defined(PQC_ALGO_SQISIGN) || defined(PQC_ALGO_HAWK)
-ldns_rdf*
-ldns_sign_public_custom(ldns_buffer* to_sign, custom_key* key_pair) {
-	#ifdef PQC_ALGO_SQISIGN
-	if (strncmp(key_pair->alg_id, PQC_ALGO_SQISIGN_SCHEME, strlen(PQC_ALGO_SQISIGN_SCHEME)) == 0) {
-		//make a temporary buffer and sign the message to there
-		//	message length is the ldns buffer's current position
-		//	because the buffer was created and then the RRset serialized to it
-		//	=> buffer position == rrset serialization length (ldns_sign_public())
-		uint32_t temp_sig_buf_len = SQISIGN_SIGNATUREBYTES + ldns_buffer_position(to_sign);
-		uint8_t temp_sig_buf[temp_sig_buf_len];
-		//sign message to create signature
-		#pragma GCC diagnostic push
-		#pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
-		int ret_code = sqisign_sign(temp_sig_buf, &temp_sig_buf_len,
-									ldns_buffer_begin(to_sign), ldns_buffer_position(to_sign),
-									key_pair->sk);
-		#pragma GCC diagnostic pop
-		if (ret_code != 0) {
-			return NULL;
-		}
-		//convert the signature from a (local stack) bytestring to an ldns rdatafield containing the sig's b64
-		//	only convert the first SQISIGN_SIGNATUREBYTES bytes of the temp_sig_buf
-		ldns_rdf* sigdata_rdf = ldns_rdf_new_frm_data(LDNS_RDF_TYPE_B64, SQISIGN_SIGNATUREBYTES, temp_sig_buf);
-		return sigdata_rdf;
-	}
-	else
-	#endif
-	#ifdef PQC_ALGO_HAWK
-	if (strncmp(key_pair->alg_id, PQC_ALGO_HAWK_SCHEME, strlen(PQC_ALGO_HAWK_SCHEME)) == 0) {
-		//intialize nistrng seed (hawk still uses randombytes during signing)
-		unsigned char seed[48];
-		randombytes_select(seed, sizeof(seed));
-		randombytes_init(seed, NULL);
-		//create the necessary buffers
-		uint32_t temp_sig_buf_len = HAWK_SIG_SIZE(HAWK_LOGN);
-		uint8_t temp_sig_buf[temp_sig_buf_len];	//buffer that the signature is stored into
-		uint8_t tmp_buf[HAWK_TMPSIZE_SIGN(HAWK_LOGN)];		//buffer only for speed-up purposes during HAWK signing
-		//sign message to create signature
-		shake_context sc_data;
-		hawk_sign_start(&sc_data);
-		shake_inject(&sc_data, ldns_buffer_begin(to_sign), ldns_buffer_position(to_sign));
-		int ret_code = hawk_sign_finish(HAWK_LOGN,
-										&hawk_randombytes, 0,
-										temp_sig_buf, &sc_data,
-										key_pair->sk,
-										tmp_buf, sizeof(tmp_buf));
-		if (ret_code != 1) {
-			return NULL;
-		}
-		//convert signature from local bytestring to ldns rdatafield containing sig's b64
-		ldns_rdf* sigdata_rdf = ldns_rdf_new_frm_data(LDNS_RDF_TYPE_B64, temp_sig_buf_len, temp_sig_buf);
-		return sigdata_rdf;
-	}
-	else
-	#endif
-	//key is of unknown algorithm
-	return NULL;
-}
-#endif
-
 
 /**
  * Pushes all rrs from the rrsets of type A and AAAA on gluelist.
@@ -1448,6 +1351,7 @@ ldns_dnssec_zone_create_rrsigs_flg( ldns_dnssec_zone *zone
 							key_list, i))
 				    );
 	}
+
 	/* TODO: callback to see is list should be signed */
 	/* TODO: remove 'old' signatures from signature list */
 	cur_node = ldns_rbtree_first(zone->names);
@@ -1520,7 +1424,6 @@ ldns_dnssec_zone_create_rrsigs_flg( ldns_dnssec_zone *zone
 					}
 					ldns_rr_list_free(siglist);
 				}
-
 				ldns_rr_list_free(rr_list);
 
 				cur_rrset = cur_rrset->next;
@@ -1560,6 +1463,7 @@ ldns_dnssec_zone_create_rrsigs_flg( ldns_dnssec_zone *zone
 		cur_node = ldns_rbtree_next(cur_node);
 	}
 
+
 #ifdef PQC_ALGO_MTL
 	ldns_dnssec_zone_update_mtl_rrsigs(new_rrs, key_list);
 #endif
@@ -1597,8 +1501,14 @@ ldns_dnssec_zone_update_mtl_rrsigs(ldns_rr_list *new_rrs, ldns_key_list *key_lis
 				#ifdef PQC_ALGO_FL_DSA_MTL_SHAKE
     			case LDNS_SIGN_FL_DSA_512_MTL_SHAKE_128:
 				#endif
-				#ifdef PQC_ALGO_ML_DSA_MTL_SHAKE
+				#ifdef PQC_ALGO_ML_DSA_44_MTL_SHAKE
     			case LDNS_SIGN_ML_DSA_44_MTL_SHAKE_128:
+				#endif
+				#ifdef PQC_ALGO_ML_DSA_65_MTL_SHAKE
+    			case LDNS_SIGN_ML_DSA_65_MTL_SHAKE_128:
+				#endif
+				#ifdef PQC_ALGO_ML_DSA_87_MTL_SHAKE
+    			case LDNS_SIGN_ML_DSA_87_MTL_SHAKE_128:
 				#endif
 				#ifdef PQC_ALGO_SLH_DSA_SHA2_MTL_SHA2
     			case LDNS_SIGN_SLH_DSA_SHA2_128s_MTL_SHA2_128:
@@ -1606,15 +1516,6 @@ ldns_dnssec_zone_update_mtl_rrsigs(ldns_rr_list *new_rrs, ldns_key_list *key_lis
 				#ifdef PQC_ALGO_SLH_DSA_SHAKE_MTL_SHAKE
     			case LDNS_SIGN_SLH_DSA_SHAKE_128s_MTL_SHAKE_128:
 				#endif
-				#ifdef PQC_ALGO_MAYO_1_MTL_SHAKE
-				case LDNS_SIGN_MAYO_1_MTL_SHAKE_128:
-				#endif
-				#ifdef PQC_ALGO_MAYO_2_MTL_SHAKE
-				case LDNS_SIGN_MAYO_2_MTL_SHAKE_128:
-				#endif
-				#ifdef PQC_ALGO_SNOVA_MTL_SHAKE
-				case LDNS_SIGN_SNOVA_24_5_4_MTL_SHAKE_128:
-				#endif	
                     sigrdf =ldns_rr_rrsig_sig(rr_ptr);
                     ldns_rdf2wire((uint8_t**)&mtl_rrsig_id, sigrdf, &mtl_rrsig_id_size);
 

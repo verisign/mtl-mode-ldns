@@ -174,20 +174,12 @@ declare -a mtl_schemes=(
     ML-DSA-44-MTL-SHAKE-128
     SLH-DSA-SHA2-128s-MTL-SHA2-128
     SLH-DSA-SHAKE-128s-MTL-SHAKE-128
-    MAYO-1-MTL-SHAKE-128
-    MAYO-2-MTL-SHAKE-128
-    SNOVA_24_5_4-MTL-SHAKE-128
 )
 declare -a pqc_schemes=(
     FL_DSA_512
     ML_DSA_44
-    MAYO-1
-    MAYO-2
     SLH_DSA_PURE_SHA2_128S
     SLH_DSA_PURE_SHAKE_128S
-    SNOVA_24_5_4
-#   Hawk-512
-#    SQIsign_lvl1
 )
 
 concatenated_scheme=""
